@@ -1,0 +1,161 @@
+[
+    {
+        "name": "Russia",
+        "code": "RUS",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "id": 1
+    },
+    {
+        "name": "United States of America",
+        "code": "USA",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "id": 2
+    },
+    {
+        "name": "Canada",
+        "code": "CAN",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "id": 3
+    },
+    {
+        "name": "Mexico",
+        "code": "MEX",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "id": 4
+    },
+    {
+        "name": "Australia",
+        "code": "AUS",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "id": 5
+    },
+    {
+        "name": "Peru",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "id": 6
+    },
+    {
+        "name": "Germany",
+        "john": false,
+        "marcia": true,
+        "todo": false,
+        "id": 7
+    },
+    {
+        "name": "Kenya",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "id": 8
+    },
+    {
+        "name": "Tanzania",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "id": 9
+    },
+    {
+        "name": "Finland",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "id": 10
+    },
+    {
+        "name": "United Kingdom",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "id": 11
+    },
+    {
+        "name": "Kazakhstan",
+        "john": false,
+        "marcia": true,
+        "todo": false,
+        "id": 12
+    },
+    {
+        "name": "Netherlands",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "id": 13
+    },
+    {
+        "name": "Antarctica",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "id": 14
+    },
+    {
+        "name": "Afghanistan",
+        "john": false,
+        "marcia": false,
+        "todo": false,
+        "id": 15
+    },
+    {
+        "name": "France",
+        "john": false,
+        "marcia": true,
+        "todo": false,
+        "id": 16
+    },
+    {
+        "name": "",
+        "john": false,
+        "marcia": false,
+        "todo": false,
+        "id": 17
+    },
+    {
+        "name": "Egypt",
+        "john": false,
+        "marcia": false,
+        "todo": true,
+        "id": 18
+    },
+    {
+        "name": "India",
+        "john": false,
+        "marcia": false,
+        "todo": true,
+        "id": 19
+    },
+    {
+        "name": "Poland",
+        "john": false,
+        "marcia": false,
+        "todo": true,
+        "id": 20
+    },
+    {
+        "name": "Colombia",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "id": 21
+    },
+    {
+        "name": "China",
+        "john": false,
+        "marcia": false,
+        "todo": false,
+        "id": 22
+    }
+]
