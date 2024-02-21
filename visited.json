@@ -97,9 +97,9 @@
     },
     {
         "name": "Antarctica",
-        "john": true,
+        "john": false,
         "marcia": false,
-        "todo": false,
+        "todo": true,
         "id": 14
     },
     {
@@ -146,7 +146,7 @@
     },
     {
         "name": "Colombia",
-        "john": true,
+        "john": false,
         "marcia": false,
         "todo": false,
         "id": 21
