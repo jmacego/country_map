@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    <!-- Map column (wide) -->
+    <div class="col-lg-9 col-md-8 vh-100" id="map"></div>
+
+    <!-- Visited countries list column (smaller) with four sections -->
+    <div class="col-lg-3 col-md-4">
+      <div class="row">
+        <div class="col-12">
+          <h4>To-Do List</h4>
+          <ul id="todoList" class="list-group">
+            <!-- List items for the to-do list -->
+          </ul>
+        </div>
+        <div class="col-12">
+          <h4>Marcia Visited</h4>
+          <ul id="marciaVisitedList" class="list-group">
+            <!-- List items for countries Marcia has visited -->
+          </ul>
+        </div>
+        <div class="col-12">
+          <h4>John Visited</h4>
+          <ul id="johnVisitedList" class="list-group">
+            <!-- List items for countries John has visited -->
+          </ul>
+        </div>
+        <div class="col-12">
+          <h4>Both Visited</h4>
+          <ul id="bothVisitedList" class="list-group">
+            <!-- List items for countries both have visited -->
+          </ul>
+        </div>
+        <div class="col-12">
+          <h4>Update Countries</h4>
+          <!-- Form for adding or updating a country -->
+          <form id="countryForm">
+            <input type="hidden" id="countryId" value="" />
+
+            <!-- Dropdown for selecting a country -->
+            <div class="form-group mb-2">
+              <select id="countryName" class="form-control">
+                <!-- Options will be added here by JavaScript -->
+              </select>
+            </div>
+
+            <!-- Checkboxes for visit status -->
+            <div class="form-group mx-sm-3 mb-2">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="visitedJohn">
+                <label class="form-check-label" for="visitedJohn">John visited</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="visitedMarcia">
+                <label class="form-check-label" for="visitedMarcia">Marcia visited</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="todo">
+                <label class="form-check-label" for="todo">To-Do</label>
+              </div>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary mb-2">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/country_map.js') }}"></script>
+{% endblock %}

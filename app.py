@@ -1,15 +1,33 @@
-from flask import Flask, send_from_directory, jsonify, request
+from flask import Flask, send_from_directory, jsonify, request, render_template
 import geopandas as gpd
 import pandas as pd
 import numpy as np
 import json
+import uuid
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-@app.route('/')
-def home():
-    return send_from_directory('static', 'index.html')
 # File path for the visited data file
 visited_file_path = 'visited.json'
+
+# File path for the links data file
+links_file_path = 'links.json'
+
+
+# World Map
+@app.route('/')
+def country_map():
+    return render_template('country_map.html', title='Visited World')
+
+# Useful Links
+@app.route('/states')
+def states():
+    return render_template('state_map.html', title='Visited States')
+
+# State Map
+@app.route('/links')
+def links():
+    return render_template('links.html', title='Travel Links')
 
 # Function to load visited data from the file
 def load_visited_data():
@@ -20,6 +38,17 @@ def load_visited_data():
 def save_visited_data(data):
     with open(visited_file_path, 'w') as file:
         json.dump(data, file, indent=4)
+
+# Function to load links data from the file
+def load_links_data():
+    with open(links_file_path, 'r') as file:
+        return json.load(file)
+
+# Function to save links data to the file
+def save_links_data(data):
+    with open(links_file_path, 'w') as file:
+        json.dump(data, file, indent=4)
+
 
 @app.route('/api/visited', methods=['GET'])
 def get_visited():
@@ -76,6 +105,42 @@ def geodata():
     
     # jsonify takes care of the headers
     return jsonify(countries_geojson)
+
+
+@app.route('/api/links', methods=['GET'])
+def get_links():
+    return jsonify(load_links_data())
+
+@app.route('/api/links', methods=['POST'])
+def add_link():
+    links = load_links_data()
+    new_link = request.json
+    new_link['id'] = str(uuid.uuid4())  # Generate a unique ID
+    new_link['position'] = len(links) + 1  # Assign position
+    new_link['notes'] = new_link.get('notes', '')  # Add notes field
+    links.append(new_link)
+    save_links_data(links)
+    return jsonify(new_link), 201
+
+@app.route('/api/links/<id>', methods=['PUT'])
+def update_link(id):
+    links = load_links_data()
+    link = next((l for l in links if l['id'] == id), None)
+    if not link:
+        return ('', 404)
+    update_data = request.json
+    link['notes'] = update_data.get('notes', link.get('notes', ''))  # Update notes field
+    link.update(update_data)
+    save_links_data(links)
+    return jsonify(link)
+
+@app.route('/api/links/<id>', methods=['DELETE'])
+def delete_link(id):
+    links = load_links_data()
+    links = [l for l in links if l['id'] != id]
+    save_links_data(links)
+    return ('', 204)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

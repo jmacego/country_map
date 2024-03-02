@@ -1,0 +1,40 @@
+<!-- links.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Manage Links</h2>
+    <form id="add-link-form" class="mb-3">
+        <div class="row g-3">
+            <div class="col">
+                <input type="text" class="form-control" id="linkName" name="name" placeholder="Link Name" required>
+            </div>
+            <div class="col">
+                <input type="url" class="form-control" id="linkUrl" name="url" value="https://" required>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Add Link</button>
+            </div>
+        </div>
+        <div class="row g-3">
+                <div class="col">
+                    <input type="textarea" class="form-control" id="linkNotes" name="notes" placeholder="Notes">
+                </div>
+        </div>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="links-list">
+            <!-- Dynamic rows will be populated here -->
+        </tbody>
+    </table>
+</div>
+
+<script src="{{ url_for('static', filename='js/links_manager.js') }}"></script>
+{% endblock %}
