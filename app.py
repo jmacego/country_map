@@ -13,32 +13,34 @@ visited_file_path = 'visited.json'
 # File path for the links data file
 links_file_path = 'links.json'
 
+# Map Data
+state_map_file = 'country_data/us_states.json'
+country_map_file = 'country_data/countries.json'
 
 # World Map
 @app.route('/')
 def country_map():
-    gdf = gpd.read_file('country_data/ne_110m_admin_0_countries.shp')
-    countries_geojson = gdf.to_json()
-    return render_template('visited_map.html', title='Visited World', countries_geojson=countries_geojson)
-
-# Useful Links
-@app.route('/states')
-def states():
-    return render_template('state_map.html', title='Visited States')
+    #gdf = gpd.read_file('country_data/ne_110m_admin_0_countries.shp')
+    #gdf = gdf[['NAME_EN', 'geometry']]
+    #geojson = gdf.to_json()
+    with open(country_map_file, 'r') as file:
+        geojson = json.load(file)
+    return render_template('visited_map.html', title='Visited World', geojson=geojson)
 
 # State Map
+@app.route('/states')
+def states():
+    #gdf = gpd.read_file('country_data/tl_2023_us_state.shp')
+    #gdf = gdf[['NAME', 'geometry']]
+    #geojson = gdf.to_json()
+    with open(state_map_file, 'r') as file:
+        geojson = json.load(file)
+    return render_template('visited_map.html', title='Visited States', geojson=geojson)
+
+# Links
 @app.route('/links')
 def links():
     return render_template('links.html', title='Travel Links')
-
-@app.route('/api/geodata')
-def geodata():
-    gdf = gpd.read_file('country_data/ne_110m_admin_0_countries.shp')
-    # Convert the GeoDataFrame to a GeoJSON
-    countries_geojson = gdf.to_json()
-    
-    # jsonify takes care of the headers
-    return jsonify(countries_geojson)
 
 # Function to load visited data from the file
 def load_visited_data():
@@ -74,14 +76,15 @@ def get_visited():
     
     return jsonify(filtered_visited)
 
-@app.route('/api/visited/<int:visited_id>', methods=['GET'])
+@app.route('/api/visited/<uuid:visited_id>', methods=['GET'])
 def get_single_visited(visited_id):
     visited = load_visited_data()
-    visited_entry = next((item for item in visited if item['id'] == visited_id), None)
+    visited_entry = next((item for item in visited if item['id'] == str(visited_id)), None)
     return jsonify(visited_entry) if visited_entry else ('', 404)
 
 @app.route('/api/visited', methods=['POST'])
 def add_or_update_visited():
+    # Get the 'whichMap' query parameter from the URL
     visited = load_visited_data()
     new_visited = request.json
     # Find if the country already exists in the data
@@ -91,18 +94,18 @@ def add_or_update_visited():
         # Update existing country data
         existing_country.update(new_visited)
     else:
-        # Assign a new ID and add the new country
-        new_id = max(item['id'] for item in visited) + 1 if visited else 1
+        # Assign a new UUID and add the new country
+        new_id = str(uuid.uuid4())
         new_visited['id'] = new_id
         visited.append(new_visited)
     
     save_visited_data(visited)
     return jsonify(new_visited), 200 if existing_country else 201
 
-@app.route('/api/visited/<int:visited_id>', methods=['PUT'])
+@app.route('/api/visited/<uuid:visited_id>', methods=['PUT'])
 def update_visited(visited_id):
     visited = load_visited_data()
-    visited_entry = next((item for item in visited if item['id'] == visited_id), None)
+    visited_entry = next((item for item in visited if item['id'] == str(visited_id)), None)
     if not visited_entry:
         return ('', 404)
     update_data = request.json
@@ -110,10 +113,10 @@ def update_visited(visited_id):
     save_visited_data(visited)
     return jsonify(visited_entry)
 
-@app.route('/api/visited/<int:visited_id>', methods=['DELETE'])
+@app.route('/api/visited/<uuid:visited_id>', methods=['DELETE'])
 def delete_visited(visited_id):
     visited = load_visited_data()
-    visited = [item for item in visited if item['id'] != visited_id]
+    visited = [item for item in visited if item['id'] != str(visited_id)]
     save_visited_data(visited)
     return ('', 204)
 

@@ -8,7 +8,7 @@ var visitedData = [];
 var geoJsonLayer;
 
 // Define the URLs for the API endpoints
-const visitedDataUrl = '/api/visited';
+const visitedDataUrl = '/api/visited?whichMap=' + whichMap;
 
 
 // Fetch the visited countries data with retry on 500 status code
@@ -87,7 +87,7 @@ function updateVisitedList() {
 
 function style(feature) {
     // Get the visit status for the country
-    var visitStatus = getCountryVisitStatus(feature.properties.NAME_EN);
+    var visitStatus = getCountryVisitStatus(feature.properties.name);
 
     // Determine the color based on the 'john' and 'marcia' properties
     var color;
@@ -132,7 +132,8 @@ document.getElementById('countryForm').addEventListener('submit', function(event
         name: countryName,
         john: visitedJohn,
         marcia: visitedMarcia,
-        todo: todo
+        todo: todo,
+        which_map: whichMap
     };
 
     // If updating, include the ID in the request body
@@ -169,12 +170,12 @@ function populateCountryDropdown() {
 
     // Add a default option
     const defaultOption = document.createElement('option');
-    defaultOption.textContent = 'Select a country';
+    defaultOption.textContent = 'Select a location';
     defaultOption.value = '';
     dropdown.appendChild(defaultOption);
 
     // Map the country names and sort them
-    countries = countriesData.features.map(feature => feature.properties.NAME_EN).sort();
+    countries = mapData.features.map(feature => feature.properties.name).sort();
 
     // Add countries as options
     countries.forEach(country => {
@@ -192,12 +193,12 @@ function updateMap() {
     }
 
     // Create a new GeoJSON layer and add it to the map
-    geoJsonLayer = L.geoJSON(countriesData, {
+    geoJsonLayer = L.geoJSON(mapData, {
         style: style,
         onEachFeature: function (feature, layer) {
-            if (feature.properties && feature.properties.NAME_EN) {
+            if (feature.properties && feature.properties.name) {
                 // Bind a tooltip to the layer that will show on hover
-                layer.bindTooltip(feature.properties.NAME_EN, {
+                layer.bindTooltip(feature.properties.name, {
                     direction: 'center', // Center the tooltip on the feature
                     className: 'countryLabel' // Custom CSS class for styling
                 });

@@ -138,7 +138,7 @@
         "marcia": false,
         "todo": false,
         "id": "32d932fa-0b85-45ea-a09e-b8a65ece5cb2",
-        "which_map": "world"
+        "which_map": "states"
     },
     {
         "name": "Egypt",
@@ -187,5 +187,229 @@
         "todo": true,
         "id": "bd625d77-c182-4743-b698-2b9ab8cba73e",
         "which_map": "world"
+    },
+    {
+        "name": "Alaska",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "id": "21297b02-662c-4e03-9962-799554b2d973",
+        "which_map": "states"
+    },
+    {
+        "name": "California",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "79979179-f904-4448-b0f5-054f5519aa3b"
+    },
+    {
+        "name": "Washington",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "6f2da22e-7f99-4e83-8d93-ec8b8d950807"
+    },
+    {
+        "name": "Arizona",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "4614f81a-300e-4ee7-a8a0-623cc5530a0e"
+    },
+    {
+        "name": "Florida",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "d413289d-ffe5-4815-8630-b63435645d99"
+    },
+    {
+        "name": "District of Columbia",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "9b41af17-4a5e-4f1f-8711-c2926b92d2de"
+    },
+    {
+        "name": "Georgia",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "96d90dbb-a31e-4edf-803f-b7823cb6430d"
+    },
+    {
+        "name": "Hawaii",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "6b3e43db-ff7a-4e7c-988e-b92579ff699e"
+    },
+    {
+        "name": "Idaho",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "44070290-8a5d-4ffa-86f4-3b30392984ef"
+    },
+    {
+        "name": "Iowa",
+        "john": false,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "c9a9e99f-fabc-4f70-a792-125d871b9e44"
+    },
+    {
+        "name": "Kansas",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "dadc78cf-85c7-457e-afa1-3300dbb798d3"
+    },
+    {
+        "name": "Louisiana",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "b3836deb-a2af-4485-a38e-99444ce10118"
+    },
+    {
+        "name": "Maryland",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "49d0574e-654a-4168-b525-9120e4e7ecc2"
+    },
+    {
+        "name": "Mississippi",
+        "john": false,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "427f5e8d-a3c7-4a83-881b-ed4217d56b80"
+    },
+    {
+        "name": "Missouri",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "5f65353c-768a-4cce-a1b0-795ff1c8ee20"
+    },
+    {
+        "name": "Montana",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "7c4948a1-1bd7-4514-95ac-4c7daca40153"
+    },
+    {
+        "name": "Nevada",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "6e1a5f69-19d1-4acd-868f-ba31220b5395"
+    },
+    {
+        "name": "New York",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "35d9242e-c481-4e19-9957-d884d961fcc6"
+    },
+    {
+        "name": "New Mexico",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "449edb16-46f9-459b-81af-a58117d9e417"
+    },
+    {
+        "name": "North Carolina",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "7bc47693-06df-4a38-b97c-0303036390ae"
+    },
+    {
+        "name": "Oregon",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "d10e0807-5f3e-4045-8958-fc54c142e410"
+    },
+    {
+        "name": "South Carolina",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "5eed31d7-e3a3-41ef-b861-3398d8c9df88"
+    },
+    {
+        "name": "New Hampshire",
+        "john": true,
+        "marcia": false,
+        "todo": false,
+        "which_map": "states",
+        "id": "d774f1d0-4b06-4352-8a4e-7f53f7c82f2f"
+    },
+    {
+        "name": "Tennessee",
+        "john": false,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "f919b2d7-f83a-4b16-90b4-49596932b36b"
+    },
+    {
+        "name": "Texas",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "0029b6a5-6cb4-4ad2-9271-f2aa682fc588"
+    },
+    {
+        "name": "Utah",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "a6fc4e65-23b7-40a3-8c21-cb589644a2c7"
+    },
+    {
+        "name": "Virginia",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "e14ae5fa-241a-4693-a6a8-c2acfe830f21"
+    },
+    {
+        "name": "Wyoming",
+        "john": true,
+        "marcia": true,
+        "todo": false,
+        "which_map": "states",
+        "id": "71ee3cf4-3b5d-4900-a137-d19e07179fa7"
     }
 ]
