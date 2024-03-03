@@ -17,7 +17,9 @@ links_file_path = 'links.json'
 # World Map
 @app.route('/')
 def country_map():
-    return render_template('country_map.html', title='Visited World')
+    gdf = gpd.read_file('country_data/ne_110m_admin_0_countries.shp')
+    countries_geojson = gdf.to_json()
+    return render_template('visited_map.html', title='Visited World', countries_geojson=countries_geojson)
 
 # Useful Links
 @app.route('/states')
@@ -28,6 +30,15 @@ def states():
 @app.route('/links')
 def links():
     return render_template('links.html', title='Travel Links')
+
+@app.route('/api/geodata')
+def geodata():
+    gdf = gpd.read_file('country_data/ne_110m_admin_0_countries.shp')
+    # Convert the GeoDataFrame to a GeoJSON
+    countries_geojson = gdf.to_json()
+    
+    # jsonify takes care of the headers
+    return jsonify(countries_geojson)
 
 # Function to load visited data from the file
 def load_visited_data():
@@ -49,10 +60,19 @@ def save_links_data(data):
     with open(links_file_path, 'w') as file:
         json.dump(data, file, indent=4)
 
-
+# Function to return a list of what areas have been visited
 @app.route('/api/visited', methods=['GET'])
 def get_visited():
-    return jsonify(load_visited_data())
+    # Get the 'whichMap' query parameter from the URL
+    which_map = request.args.get('whichMap', default='world', type=str).removeprefix('Visited ').lower()
+    
+    # Load the visited data from the file
+    visited = load_visited_data()
+    
+    # Filter the visited data based on the 'which_map' key
+    filtered_visited = [place for place in visited if place.get('which_map') == which_map]
+    
+    return jsonify(filtered_visited)
 
 @app.route('/api/visited/<int:visited_id>', methods=['GET'])
 def get_single_visited(visited_id):
@@ -96,16 +116,6 @@ def delete_visited(visited_id):
     visited = [item for item in visited if item['id'] != visited_id]
     save_visited_data(visited)
     return ('', 204)
-
-@app.route('/api/geodata')
-def geodata():
-    gdf = gpd.read_file('country_data/ne_110m_admin_0_countries.shp')
-    # Convert the GeoDataFrame to a GeoJSON
-    countries_geojson = gdf.to_json()
-    
-    # jsonify takes care of the headers
-    return jsonify(countries_geojson)
-
 
 @app.route('/api/links', methods=['GET'])
 def get_links():

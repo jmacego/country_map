@@ -5,7 +5,8 @@
         "john": true,
         "marcia": true,
         "todo": false,
-        "id": 1
+        "id": "f3ea28f1-8b75-4a08-a865-aae29785fe2a",
+        "which_map": "world"
     },
     {
         "name": "United States of America",
@@ -13,7 +14,8 @@
         "john": true,
         "marcia": true,
         "todo": false,
-        "id": 2
+        "id": "fc5eb4d5-144a-4549-876a-bec7922188a5",
+        "which_map": "world"
     },
     {
         "name": "Canada",
@@ -21,7 +23,8 @@
         "john": true,
         "marcia": true,
         "todo": false,
-        "id": 3
+        "id": "ccf94760-9b57-4d35-9984-eaac78672723",
+        "which_map": "world"
     },
     {
         "name": "Mexico",
@@ -29,7 +32,8 @@
         "john": true,
         "marcia": true,
         "todo": false,
-        "id": 4
+        "id": "6b0ee8b4-c1db-46de-848c-12e9c0463f8b",
+        "which_map": "world"
     },
     {
         "name": "Australia",
@@ -37,132 +41,151 @@
         "john": true,
         "marcia": true,
         "todo": false,
-        "id": 5
+        "id": "87db4be2-d1a1-4cbc-9101-1e0f4d965804",
+        "which_map": "world"
     },
     {
         "name": "Peru",
         "john": true,
         "marcia": true,
         "todo": false,
-        "id": 6
+        "id": "28fcd864-ae32-4b98-8a61-926c666e9096",
+        "which_map": "world"
     },
     {
         "name": "Germany",
         "john": false,
         "marcia": true,
         "todo": false,
-        "id": 7
+        "id": "b9a381ba-ed57-47e2-a335-057b0fc664ae",
+        "which_map": "world"
     },
     {
         "name": "Kenya",
         "john": true,
         "marcia": false,
         "todo": false,
-        "id": 8
+        "id": "bab3d2b3-836e-423f-9b80-a8ef3f07e66e",
+        "which_map": "world"
     },
     {
         "name": "Tanzania",
         "john": true,
         "marcia": false,
         "todo": false,
-        "id": 9
+        "id": "ba9170e1-4716-4400-ae2b-36206578355c",
+        "which_map": "world"
     },
     {
         "name": "Finland",
         "john": true,
         "marcia": false,
         "todo": false,
-        "id": 10
+        "id": "142af80b-3aa0-4167-a191-ea2aae19e53d",
+        "which_map": "world"
     },
     {
         "name": "United Kingdom",
         "john": true,
         "marcia": true,
         "todo": false,
-        "id": 11
+        "id": "71965e72-bc3c-4dc1-a890-21f81ef16273",
+        "which_map": "world"
     },
     {
         "name": "Kazakhstan",
         "john": false,
         "marcia": true,
         "todo": false,
-        "id": 12
+        "id": "4c30d181-3a29-415d-a356-0ad3fca2bc25",
+        "which_map": "world"
     },
     {
         "name": "Netherlands",
         "john": true,
         "marcia": false,
         "todo": false,
-        "id": 13
+        "id": "fa3502db-81f9-496e-8a57-475706f03927",
+        "which_map": "world"
     },
     {
         "name": "Antarctica",
         "john": false,
         "marcia": false,
         "todo": true,
-        "id": 14
+        "id": "3c4e7a43-a860-4e4f-9e1f-db38bef7d5bf",
+        "which_map": "world"
     },
     {
         "name": "Afghanistan",
         "john": false,
         "marcia": false,
         "todo": false,
-        "id": 15
+        "id": "d39c78f4-e352-44ad-aee0-b98ff764b69b",
+        "which_map": "world"
     },
     {
         "name": "France",
         "john": false,
         "marcia": true,
         "todo": false,
-        "id": 16
+        "id": "9192e7bf-ee5d-4bac-8f1f-6e448063a417",
+        "which_map": "world"
     },
     {
         "name": "",
         "john": false,
         "marcia": false,
         "todo": false,
-        "id": 17
+        "id": "32d932fa-0b85-45ea-a09e-b8a65ece5cb2",
+        "which_map": "world"
     },
     {
         "name": "Egypt",
         "john": false,
         "marcia": false,
         "todo": true,
-        "id": 18
+        "id": "de314f1c-7a68-427a-b522-c028f1530443",
+        "which_map": "world"
     },
     {
         "name": "India",
         "john": false,
         "marcia": false,
         "todo": true,
-        "id": 19
+        "id": "2015d2c1-201f-4cef-9984-5b5bb7bb912a",
+        "which_map": "world"
     },
     {
         "name": "Poland",
         "john": false,
         "marcia": false,
         "todo": true,
-        "id": 20
+        "id": "76f28245-01aa-4063-8f99-03ca90c0971d",
+        "which_map": "world"
     },
     {
         "name": "Colombia",
         "john": false,
         "marcia": false,
         "todo": false,
-        "id": 21
+        "id": "0d1730a8-563e-4f81-a061-2216ab8e854d",
+        "which_map": "world"
     },
     {
         "name": "China",
         "john": false,
         "marcia": false,
         "todo": false,
-        "id": 22
+        "id": "358df086-0627-4719-8d30-50a30e24f12a",
+        "which_map": "world"
     },
     {
         "name": "Japan",
         "john": false,
         "marcia": false,
         "todo": true,
-        "id": 23
+        "id": "bd625d77-c182-4743-b698-2b9ab8cba73e",
+        "which_map": "world"
     }
 ]
