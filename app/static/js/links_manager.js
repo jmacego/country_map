@@ -95,24 +95,37 @@ document.addEventListener('DOMContentLoaded', function() {
         linksListElement.innerHTML = '';
         links.forEach(link => {
             const row = linksListElement.insertRow();
-            row.innerHTML = `
-                <td><input type="text" class="form-control link-name" value="${link.name}" data-id="${link.id}"></td>
-                <td><input type="text" class="form-control link-url" value="${link.url}" data-id="${link.id}"></td>
-                <td><textarea class="form-control link-notes" data-id="${link.id}">${link.notes || ''}</textarea></td>
+            const viewModeHTML = `
+                <td><a href="${link.url}" target="_blank">${link.name}</a></td>
+                <td>${link.notes || ''}</td>
                 <td>
-                    <button class="btn btn-info btn-sm me-1 modify-button" data-id="${link.id}">Modify</button>
+                    <button class="btn btn-info btn-sm me-1 edit-button" data-id="${link.id}">Edit</button>
                     <button class="btn btn-danger btn-sm delete-button" data-id="${link.id}">Delete</button>
                 </td>
             `;
+            row.innerHTML = viewModeHTML;
     
             // Attach event listeners to buttons
-            row.querySelector('.modify-button').addEventListener('click', () => updateLink(link.id));
+            row.querySelector('.edit-button').addEventListener('click', function() {
+                this.closest('tr').innerHTML = `
+                    <td><input type="text" class="form-control link-name" value="${link.name}" data-id="${link.id}"></td>
+                    <td><input type="text" class="form-control link-url" value="${link.url}" data-id="${link.id}"></td>
+                    <td><textarea class="form-control link-notes" data-id="${link.id}">${link.notes || ''}</textarea></td>
+                    <td>
+                        <button class="btn btn-success btn-sm me-1 save-button" data-id="${link.id}">Save</button>
+                        <button class="btn btn-danger btn-sm delete-button" data-id="${link.id}">Delete</button>
+                    </td>
+                `;
+                // Attach event listener to the save button
+                row.querySelector('.save-button').addEventListener('click', function() {
+                    updateLink(this.dataset.id, true);
+                });
+                // Reattach event listener to the delete button
+                row.querySelector('.delete-button').addEventListener('click', () => deleteLink(link.id));
+            });
             row.querySelector('.delete-button').addEventListener('click', () => deleteLink(link.id));
         });
     }
-    
-
-
 
     // Initial fetch of links
     fetchLinks();
