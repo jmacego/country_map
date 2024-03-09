@@ -70,6 +70,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+country_map
 
 # PyBuilder
 .pybuilder/
