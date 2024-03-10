@@ -1,5 +1,7 @@
+from flask import session, current_app, redirect, url_for
 import json
 import uuid
+from functools import wraps
 
 # File path for the visited data file
 visited_file_path = 'instance/visited.json'
@@ -28,3 +30,19 @@ class LinksData:
     def save_links_data(data):
         with open(links_file_path, 'w') as file:
             json.dump(data, file, indent=4)
+
+def is_email_allowed(email, allowed_emails):
+    """Check if the provided email is in the list of allowed emails."""
+    return email in allowed_emails
+
+# Decorator to check if user is authorized
+def require_email_authorization(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        email = session.get('email')
+        allowed_emails = current_app.config['ALLOWED_EMAIL']
+        if not is_email_allowed(email, allowed_emails):
+            # Redirect to the authorization route if the email is not allowed
+            return redirect(url_for('views.oauth2_authorize', provider='google'))
+        return f(*args, **kwargs)
+    return decorated_function

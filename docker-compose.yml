@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
-    command: gunicorn --workers 3 --bind 0.0.0.0:8000 -m 007 'app:create_app()'
+    command: gunicorn --workers 3 --bind 0.0.0.0:8000 --reload --access-logfile - --error-logfile - -m 007 'app:create_app()'
     volumes:
       - .:/usr/src/app
     expose:
