@@ -1,17 +1,16 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, Blueprint
 import json
 import uuid
 from .models import VisitedData, LinksData
 
-app = Flask(__name__)
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+views_blueprint = Blueprint('views', __name__)
 
 # Map Data
 state_map_file = 'country_data/us_states.json'
 country_map_file = 'country_data/countries.json'
 
 # World Map
-@app.route('/')
+@views_blueprint.route('/')
 def country_map():
     #gdf = gpd.read_file('country_data/ne_110m_admin_0_countries.shp')
     #gdf = gdf[['NAME_EN', 'geometry']]
@@ -21,7 +20,7 @@ def country_map():
     return render_template('visited_map.html', title='Visited World', geojson=geojson)
 
 # State Map
-@app.route('/states')
+@views_blueprint.route('/states')
 def states():
     #gdf = gpd.read_file('country_data/tl_2023_us_state.shp')
     #gdf = gdf[['NAME', 'geometry']]
@@ -31,12 +30,12 @@ def states():
     return render_template('visited_map.html', title='Visited States', geojson=geojson)
 
 # Links
-@app.route('/links')
+@views_blueprint.route('/links')
 def links():
     return render_template('links.html', title='Travel Links')
 
 # Function to return a list of what areas have been visited
-@app.route('/api/visited', methods=['GET'])
+@views_blueprint.route('/api/visited', methods=['GET'])
 def get_visited():
     # Get the 'whichMap' query parameter from the URL
     which_map = request.args.get('whichMap', default='world', type=str).removeprefix('Visited ').lower()
@@ -49,13 +48,13 @@ def get_visited():
     
     return jsonify(filtered_visited)
 
-@app.route('/api/visited/<uuid:visited_id>', methods=['GET'])
+@views_blueprint.route('/api/visited/<uuid:visited_id>', methods=['GET'])
 def get_single_visited(visited_id):
     visited = visited = VisitedData.load_visited_data()
     visited_entry = next((item for item in visited if item['id'] == str(visited_id)), None)
     return jsonify(visited_entry) if visited_entry else ('', 404)
 
-@app.route('/api/visited', methods=['POST'])
+@views_blueprint.route('/api/visited', methods=['POST'])
 def add_or_update_visited():
     # Get the 'whichMap' query parameter from the URL
     visited = visited = VisitedData.load_visited_data()
@@ -75,7 +74,7 @@ def add_or_update_visited():
     VisitedData.save_visited_data(visited)
     return jsonify(new_visited), 200 if existing_country else 201
 
-@app.route('/api/visited/<uuid:visited_id>', methods=['PUT'])
+@views_blueprint.route('/api/visited/<uuid:visited_id>', methods=['PUT'])
 def update_visited(visited_id):
     visited = visited = VisitedData.load_visited_data()
     visited_entry = next((item for item in visited if item['id'] == str(visited_id)), None)
@@ -86,18 +85,18 @@ def update_visited(visited_id):
     VisitedData.save_visited_data(visited)
     return jsonify(visited_entry)
 
-@app.route('/api/visited/<uuid:visited_id>', methods=['DELETE'])
+@views_blueprint.route('/api/visited/<uuid:visited_id>', methods=['DELETE'])
 def delete_visited(visited_id):
     visited = visited = VisitedData.load_visited_data()
     visited = [item for item in visited if item['id'] != str(visited_id)]
     VisitedData.save_visited_data(visited)
     return ('', 204)
 
-@app.route('/api/links', methods=['GET'])
+@views_blueprint.route('/api/links', methods=['GET'])
 def get_links():
     return jsonify(LinksData.load_links_data())
 
-@app.route('/api/links', methods=['POST'])
+@views_blueprint.route('/api/links', methods=['POST'])
 def add_link():
     links = LinksData.load_links_data()
     new_link = request.json
@@ -108,7 +107,7 @@ def add_link():
     LinksData.save_links_data(links)
     return jsonify(new_link), 201
 
-@app.route('/api/links/<id>', methods=['PUT'])
+@views_blueprint.route('/api/links/<id>', methods=['PUT'])
 def update_link(id):
     links = LinksData.load_links_data()
     link = next((l for l in links if l['id'] == id), None)
@@ -120,7 +119,7 @@ def update_link(id):
     LinksData.save_links_data(links)
     return jsonify(link)
 
-@app.route('/api/links/<id>', methods=['DELETE'])
+@views_blueprint.route('/api/links/<id>', methods=['DELETE'])
 def delete_link(id):
     links = LinksData.load_links_data()
     links = [l for l in links if l['id'] != id]
