@@ -10,13 +10,38 @@ visited_file_path = 'instance/visited.json'
 links_file_path = 'instance/links.json'
 
 class VisitedData:
+    """
+    A class used to handle the loading and saving of visited data.
+
+    This class provides static methods to load and save data related to visited places, such as countries or states, from a JSON file.
+    """
+
     @staticmethod
     def load_visited_data():
+        """
+        Load visited data from a JSON file.
+
+        This method reads from a file specified by 'visited_file_path' and loads the JSON data into memory.
+
+        Returns:
+            list: A list of dictionaries containing visited data.
+        """
         with open(visited_file_path, 'r') as file:
             return json.load(file)
 
     @staticmethod
     def save_visited_data(data):
+        """
+        Save visited data to a JSON file.
+
+        This method writes the provided data to a file specified by 'visited_file_path', formatting it with an indentation of 4 spaces for readability.
+
+        Args:
+            data (list): A list of dictionaries containing visited data to be saved.
+
+        Returns:
+            None
+        """
         with open(visited_file_path, 'w') as file:
             json.dump(data, file, indent=4)
 
@@ -32,11 +57,30 @@ class LinksData:
             json.dump(data, file, indent=4)
 
 def is_email_allowed(email, allowed_emails):
-    """Check if the provided email is in the list of allowed emails."""
+    """
+    Check if the provided email is in the list of allowed emails.
+
+    Args:
+        email (str): The email address to check.
+        allowed_emails (list): A list of email addresses that are allowed.
+
+    Returns:
+        bool: True if the email is allowed, False otherwise.
+    """
     return email in allowed_emails
 
-# Decorator to check if user is authorized
 def require_email_authorization(f):
+    """
+    Decorator to check if the user is authorized based on their email.
+
+    This decorator retrieves the user's email from the session and checks if it is in the list of allowed emails. If the email is not allowed, it redirects the user to the OAuth2 authorization route.
+
+    Args:
+        f (function): The Flask view function to decorate.
+
+    Returns:
+        function: The decorated view function.
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         email = session.get('email')
