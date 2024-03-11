@@ -77,7 +77,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script type="text/javascript">
-  var mapData = {{ geojson | safe }};
   var whichMap = "{{ title|replace('Visited ', '')|lower }}"
 </script>
 <script src="{{ url_for('static', filename='js/visited_map.js') }}"></script>

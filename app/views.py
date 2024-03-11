@@ -13,106 +13,17 @@ from .models import VisitedData, LinksData, require_email_authorization
 load_dotenv()
 views_blueprint = Blueprint('views', __name__)
 
-# Map Data
-state_map_file = 'country_data/us_states.json'
-country_map_file = 'country_data/countries.json'
-
 # World Map
 @views_blueprint.route('/')
 @require_email_authorization
 def country_map():
-    with open(country_map_file, 'r') as file:
-        geojson = json.load(file)
-    return render_template('visited_map.html', title='Visited World', geojson=geojson)
-
-# OAuth routes
-@views_blueprint.route('/authorize/<provider>')
-def oauth2_authorize(provider):
-
-    provider_data = current_app.config['OAUTH2_PROVIDERS'].get(provider)
-    if provider_data is None:
-        abort(404)
-
-    # generate a random string for the state parameter
-    session['oauth2_state'] = secrets.token_urlsafe(16)
-
-    # create a query string with all the OAuth2 parameters
-    qs = urlencode({
-        'client_id': provider_data['client_id'],
-        'redirect_uri': url_for('views.oauth2_callback', provider=provider,
-                                _external=True),
-        'response_type': 'code',
-        'scope': ' '.join(provider_data['scopes']),
-        'state': session['oauth2_state'],
-    })
-
-    # redirect the user to the OAuth2 provider authorization URL
-    return redirect(provider_data['authorize_url'] + '?' + qs)
-
-@views_blueprint.route('/callback/<provider>')
-def oauth2_callback(provider):
-
-    provider_data = current_app.config['OAUTH2_PROVIDERS'].get(provider)
-    if provider_data is None:
-        abort(404)
-
-    # if there was an authentication error, flash the error messages and exit
-    if 'error' in request.args:
-        for k, v in request.args.items():
-            if k.startswith('error'):
-                flash(f'{k}: {v}')
-        return redirect(url_for('views.country_map'))
-
-    # make sure that the state parameter matches the one we created in the
-    # authorization request
-    if request.args['state'] != session.get('oauth2_state'):
-        abort(401)
-
-    # make sure that the authorization code is present
-    if 'code' not in request.args:
-        abort(401)
-
-    # exchange the authorization code for an access token
-    response = requests.post(provider_data['token_url'], data={
-        'client_id': provider_data['client_id'],
-        'client_secret': provider_data['client_secret'],
-        'code': request.args['code'],
-        'grant_type': 'authorization_code',
-        'redirect_uri': url_for('views.oauth2_callback', provider=provider,
-                                _external=True),
-    }, headers={'Accept': 'application/json'})
-    if response.status_code != 200:
-        abort(401)
-    oauth2_token = response.json().get('access_token')
-    if not oauth2_token:
-        abort(401)
-
-    # use the access token to get the user's email address
-    response = requests.get(provider_data['userinfo']['url'], headers={
-        'Authorization': 'Bearer ' + oauth2_token,
-        'Accept': 'application/json',
-    })
-    if response.status_code != 200:
-        abort(401)
-    email = provider_data['userinfo']['email'](response.json())
-
-    session['email'] = email
-    return redirect(url_for('views.country_map'))
-
-@views_blueprint.route('/email')
-def email():
-    return(session.get('email'))
+    return render_template('visited_map.html', title='Visited World')
 
 # State Map
 @views_blueprint.route('/states')
 @require_email_authorization
 def states():
-    #gdf = gpd.read_file('country_data/tl_2023_us_state.shp')
-    #gdf = gdf[['NAME', 'geometry']]
-    #geojson = gdf.to_json()
-    with open(state_map_file, 'r') as file:
-        geojson = json.load(file)
-    return render_template('visited_map.html', title='Visited States', geojson=geojson)
+    return render_template('visited_map.html', title='Visited States')
 
 # Links
 @views_blueprint.route('/links')
@@ -220,3 +131,81 @@ def delete_link(id):
     links = [l for l in links if l['id'] != id]
     LinksData.save_links_data(links)
     return ('', 204)
+
+# OAuth routes
+@views_blueprint.route('/authorize/<provider>')
+def oauth2_authorize(provider):
+
+    provider_data = current_app.config['OAUTH2_PROVIDERS'].get(provider)
+    if provider_data is None:
+        abort(404)
+
+    # generate a random string for the state parameter
+    session['oauth2_state'] = secrets.token_urlsafe(16)
+
+    # create a query string with all the OAuth2 parameters
+    qs = urlencode({
+        'client_id': provider_data['client_id'],
+        'redirect_uri': url_for('views.oauth2_callback', provider=provider,
+                                _external=True),
+        'response_type': 'code',
+        'scope': ' '.join(provider_data['scopes']),
+        'state': session['oauth2_state'],
+    })
+
+    # redirect the user to the OAuth2 provider authorization URL
+    return redirect(provider_data['authorize_url'] + '?' + qs)
+
+@views_blueprint.route('/callback/<provider>')
+def oauth2_callback(provider):
+
+    provider_data = current_app.config['OAUTH2_PROVIDERS'].get(provider)
+    if provider_data is None:
+        abort(404)
+
+    # if there was an authentication error, flash the error messages and exit
+    if 'error' in request.args:
+        for k, v in request.args.items():
+            if k.startswith('error'):
+                flash(f'{k}: {v}')
+        return redirect(url_for('views.country_map'))
+
+    # make sure that the state parameter matches the one we created in the
+    # authorization request
+    if request.args['state'] != session.get('oauth2_state'):
+        abort(401)
+
+    # make sure that the authorization code is present
+    if 'code' not in request.args:
+        abort(401)
+
+    # exchange the authorization code for an access token
+    response = requests.post(provider_data['token_url'], data={
+        'client_id': provider_data['client_id'],
+        'client_secret': provider_data['client_secret'],
+        'code': request.args['code'],
+        'grant_type': 'authorization_code',
+        'redirect_uri': url_for('views.oauth2_callback', provider=provider,
+                                _external=True),
+    }, headers={'Accept': 'application/json'})
+    if response.status_code != 200:
+        abort(401)
+    oauth2_token = response.json().get('access_token')
+    if not oauth2_token:
+        abort(401)
+
+    # use the access token to get the user's email address
+    response = requests.get(provider_data['userinfo']['url'], headers={
+        'Authorization': 'Bearer ' + oauth2_token,
+        'Accept': 'application/json',
+    })
+    if response.status_code != 200:
+        abort(401)
+    email = provider_data['userinfo']['email'](response.json())
+
+    session['email'] = email
+    return redirect(url_for('views.country_map'))
+
+@views_blueprint.route('/email')
+def email():
+    return(session.get('email'))

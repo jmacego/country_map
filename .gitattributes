@@ -2,3 +2,4 @@
 /country_data/tl_2023_us_uac20.shp filter=lfs diff=lfs merge=lfs -text
 /country_data/tl_2023_us_uac20.zip filter=lfs diff=lfs merge=lfs -text
 /country_data/us_states.json filter=lfs diff=lfs merge=lfs -text
+app/static/data/states.json filter=lfs diff=lfs merge=lfs -text

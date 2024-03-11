@@ -23,14 +23,8 @@ def convert_shapefile_to_json(shapefile_path, output_json_path, name_field):
 
 # Convert US states shapefile to JSON
 convert_shapefile_to_json(
-    shapefile_path='country_data/tl_2023_us_state.shp',
-    output_json_path='country_data/us_states.json',
+    shapefile_path='country_data/cb_2018_us_state_500k.shp',
+    output_json_path='app/static/data/states.json',
     name_field='NAME'
 )
 
-# Convert countries shapefile to JSON
-convert_shapefile_to_json(
-    shapefile_path='country_data/ne_110m_admin_0_countries.shp',
-    output_json_path='country_data/countries.json',
-    name_field='NAME_EN'
-)

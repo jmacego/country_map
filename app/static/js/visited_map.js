@@ -10,6 +10,29 @@ var geoJsonLayer;
 // Define the URLs for the API endpoints
 const visitedDataUrl = '/api/visited?whichMap=' + whichMap;
 
+const mapDataURL = '/static/data/' + whichMap + '.json'
+
+var mapData = [];
+
+console.log("Set blank mapData variable")
+console.log(mapData)
+
+// Fetch the right map data
+async function loadMap() {
+    try {
+      const response = await fetch(mapDataURL);
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      mapData = await response.json();
+      console.log("Set mapData variable")
+      console.log(mapData)
+
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
 
 // Fetch the visited countries data with retry on 500 status code
 function fetchAndUpdateVisitedData(attempt = 1) {
@@ -156,6 +179,7 @@ document.getElementById('countryForm').addEventListener('submit', function(event
         // Update the UI as needed
     })
     .then(fetchAndUpdateVisitedData())
+    .then(populateCountryDropdown())
     .catch((error) => {
         console.error('Error:', error);
     });
@@ -205,8 +229,18 @@ function updateMap() {
             }
         }
     }).addTo(map);
+
+    if (whichMap == "states") {
+        map.flyTo([34.20, -118.53], 3.5);
+    }
 }
 
-updateMap();
-populateCountryDropdown();
-fetchAndUpdateVisitedData();
+async function initialize() {
+    await loadMap(); // Wait for loadMap to finish
+    updateMap();     // Now you can call updateMap
+    populateCountryDropdown(); // And then populateCountryDropdown
+    fetchAndUpdateVisitedData(); // Finally, call fetchAndUpdateVisitedData
+  }
+  
+  // Call initialize to start the process
+  initialize();
