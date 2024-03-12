@@ -1,5 +1,5 @@
 from flask import Flask
-from .views import views_blueprint
+from .views import views
 import os
 from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
@@ -64,6 +64,6 @@ def create_app():
 }
 
     # Register blueprints
-    app.register_blueprint(views_blueprint)
+    app.register_blueprint(views)
 
     return app

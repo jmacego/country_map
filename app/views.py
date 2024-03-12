@@ -5,15 +5,17 @@ import uuid
 import os
 import secrets
 import requests
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
 from urllib.parse import urlencode
-from .models import VisitedData, LinksData, require_email_authorization
+from .models import VisitedData, LinksData, require_email_authorization, remaining_days
 
 # Load environment variables
 load_dotenv()
-views_blueprint = Blueprint('views', __name__)
+views = Blueprint('views', __name__)
 
-@views_blueprint.route('/')
+@views.route('/')
 @require_email_authorization
 def world_map():
     """
@@ -26,7 +28,7 @@ def world_map():
     """
     return render_template('visited_map.html', title='Visited World')
 
-@views_blueprint.route('/states')
+@views.route('/states')
 @require_email_authorization
 def states():
     """
@@ -39,7 +41,7 @@ def states():
     """
     return render_template('visited_map.html', title='Visited States')
 
-@views_blueprint.route('/links')
+@views.route('/links')
 @require_email_authorization
 def links():
     """
@@ -52,8 +54,40 @@ def links():
     """
     return render_template('links.html', title='Travel Links')
 
+@views.route('/daysleft')
+def days_left():
+    """
+    Display the days remaining until Marcia finishes school, excluding specific dates.
+    Also display the total number of months and days remaining from today until the end date.
+    """
+    # Define the start date (today) and the end date
+    start_date = datetime.now()
+    end_date = datetime(2024, 6, 17)
 
-@views_blueprint.route('/api/visited', methods=['GET'])
+    # List of dates to exclude (format: 'YYYY-MM-DD')
+    excluded_dates = ['2024-03-25', '2024-03-26', '2024-03-27', '2024-03-28', '2024-03-29',
+                      '2024-03-30', '2024-03-31', '2024-04-01', '2024-04-02', '2024-04-03',
+                      '2024-04-04', '2024-04-05', '2024-05-27']
+
+    # Calculate the number of weekdays, excluding specific dates
+    number_of_weekdays = remaining_days(start_date, end_date, excluded_dates)
+
+    # Calculate the total number of months and days remaining
+    delta = relativedelta(end_date, start_date)
+    months_remaining = delta.months
+    days_remaining = delta.days
+
+    # Calculate the total number of days remaining without exclusions
+    total_days_remaining = (end_date - start_date).days
+
+    # Render a template with the result
+    return render_template('daysleft.html', number_of_weekdays=number_of_weekdays,
+                           months_remaining=months_remaining, days_remaining=days_remaining,
+                           total_days_remaining=total_days_remaining,
+                           start_date=start_date, end_date=end_date,
+                           title='Days Left')
+
+@views.route('/api/visited', methods=['GET'])
 @require_email_authorization
 def get_visited():
     """
@@ -79,7 +113,7 @@ def get_visited():
     return jsonify(filtered_visited)
 
 
-@views_blueprint.route('/api/visited/<uuid:visited_id>', methods=['GET'])
+@views.route('/api/visited/<uuid:visited_id>', methods=['GET'])
 @require_email_authorization
 def get_single_visited(visited_id):
     """
@@ -98,7 +132,7 @@ def get_single_visited(visited_id):
     return jsonify(visited_entry) if visited_entry else ('', 404)
 
 
-@views_blueprint.route('/api/visited', methods=['POST'])
+@views.route('/api/visited', methods=['POST'])
 @require_email_authorization
 def add_or_update_visited():
     """
@@ -130,7 +164,7 @@ def add_or_update_visited():
     VisitedData.save_visited_data(visited)
     return jsonify(new_visited), 200 if existing_country else 201
 
-@views_blueprint.route('/api/visited/<uuid:visited_id>', methods=['PUT'])
+@views.route('/api/visited/<uuid:visited_id>', methods=['PUT'])
 @require_email_authorization
 def update_visited(visited_id):
     """
@@ -153,7 +187,7 @@ def update_visited(visited_id):
     VisitedData.save_visited_data(visited)
     return jsonify(visited_entry)
 
-@views_blueprint.route('/api/visited/<uuid:visited_id>', methods=['DELETE'])
+@views.route('/api/visited/<uuid:visited_id>', methods=['DELETE'])
 @require_email_authorization
 def delete_visited(visited_id):
     """
@@ -172,7 +206,7 @@ def delete_visited(visited_id):
     VisitedData.save_visited_data(visited)
     return ('', 204)
 
-@views_blueprint.route('/api/links', methods=['GET'])
+@views.route('/api/links', methods=['GET'])
 @require_email_authorization
 def get_links():
     """
@@ -185,7 +219,7 @@ def get_links():
     """
     return jsonify(LinksData.load_links_data())
 
-@views_blueprint.route('/api/links', methods=['POST'])
+@views.route('/api/links', methods=['POST'])
 @require_email_authorization
 def add_link():
     """
@@ -205,7 +239,7 @@ def add_link():
     LinksData.save_links_data(links)
     return jsonify(new_link), 201
 
-@views_blueprint.route('/api/links/<id>', methods=['PUT'])
+@views.route('/api/links/<id>', methods=['PUT'])
 @require_email_authorization
 def update_link(id):
     """
@@ -229,7 +263,7 @@ def update_link(id):
     LinksData.save_links_data(links)
     return jsonify(link)
 
-@views_blueprint.route('/api/links/<id>', methods=['DELETE'])
+@views.route('/api/links/<id>', methods=['DELETE'])
 @require_email_authorization
 def delete_link(id):
     """
@@ -248,7 +282,7 @@ def delete_link(id):
     LinksData.save_links_data(links)
     return ('', 204)
 
-@views_blueprint.route('/authorize/<provider>')
+@views.route('/authorize/<provider>')
 def oauth2_authorize(provider):
     """
     Initiate OAuth2 authorization for a specified provider.
@@ -284,7 +318,7 @@ def oauth2_authorize(provider):
     # redirect the user to the OAuth2 provider authorization URL
     return redirect(provider_data['authorize_url'] + '?' + qs)
 
-@views_blueprint.route('/callback/<provider>')
+@views.route('/callback/<provider>')
 def oauth2_callback(provider):
     """
     Handle the OAuth2 callback from the provider.
@@ -347,7 +381,7 @@ def oauth2_callback(provider):
     session['email'] = email
     return redirect(url_for('views.world_map'))
 
-@views_blueprint.route('/email')
+@views.route('/email')
 def email():
     """Test route. Display e-mail user is logged in as"""
     return(session.get('email'))
