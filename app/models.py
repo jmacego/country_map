@@ -1,6 +1,7 @@
 from flask import session, current_app, redirect, url_for
 import json
 import uuid
+import os
 from functools import wraps
 from datetime import datetime, timedelta
 
@@ -109,6 +110,11 @@ def require_email_authorization(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # Check if the application is running in development or staging
+        if os.environ.get('FLASK_ENV') in ['development', 'staging']:
+            # Bypass the authorization check
+            return f(*args, **kwargs)
+        
         email = session.get('email')
         allowed_emails = current_app.config['ALLOWED_EMAIL']
         if not is_email_allowed(email, allowed_emails):
