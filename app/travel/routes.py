@@ -9,13 +9,16 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
 from urllib.parse import urlencode
-from .models import VisitedData, LinksData, require_email_authorization, remaining_days
+from ..models.travel import VisitedData, LinksData
+from ..models.auth import require_email_authorization
+from ..models.misc import remaining_days
+
+from app.travel import bp
 
 # Load environment variables
 load_dotenv()
-views = Blueprint('views', __name__)
 
-@views.route('/')
+@bp.route('/world')
 @require_email_authorization
 def world_map():
     """
@@ -26,9 +29,9 @@ def world_map():
     Returns:
         render_template (flask.Response): A Flask response object that renders the 'visited_map.html' template with the title 'Visited World'.
     """
-    return render_template('visited_map.html', title='Visited World')
+    return render_template('travel/visited_map.html', title='Visited World')
 
-@views.route('/states')
+@bp.route('/states')
 @require_email_authorization
 def states():
     """
@@ -39,9 +42,9 @@ def states():
     Returns:
         render_template (flask.Response): A Flask response object that renders the 'visited_map.html' template with the title 'Visited States'.
     """
-    return render_template('visited_map.html', title='Visited States')
+    return render_template('travel/visited_map.html', title='Visited States')
 
-@views.route('/links')
+@bp.route('/links')
 @require_email_authorization
 def links():
     """
@@ -52,9 +55,9 @@ def links():
     Returns:
         render_template (flask.Response): A Flask response object that renders the 'links.html' template with the title 'Travel Links'.
     """
-    return render_template('links.html', title='Travel Links')
+    return render_template('travel/links.html', title='Travel Links')
 
-@views.route('/daysleft')
+@bp.route('/daysleft')
 def days_left():
     """
     Display the days remaining until Marcia finishes school, excluding specific dates.
@@ -81,13 +84,13 @@ def days_left():
     total_days_remaining = (end_date - start_date).days
 
     # Render a template with the result
-    return render_template('daysleft.html', number_of_weekdays=number_of_weekdays,
+    return render_template('travel/daysleft.html', number_of_weekdays=number_of_weekdays,
                            months_remaining=months_remaining, days_remaining=days_remaining,
                            total_days_remaining=total_days_remaining,
                            start_date=start_date, end_date=end_date,
                            title='Days Left')
 
-@views.route('/api/visited', methods=['GET'])
+@bp.route('/api/visited', methods=['GET'])
 @require_email_authorization
 def get_visited():
     """
@@ -113,7 +116,7 @@ def get_visited():
     return jsonify(filtered_visited)
 
 
-@views.route('/api/visited/<uuid:visited_id>', methods=['GET'])
+@bp.route('/api/visited/<uuid:visited_id>', methods=['GET'])
 @require_email_authorization
 def get_single_visited(visited_id):
     """
@@ -132,7 +135,7 @@ def get_single_visited(visited_id):
     return jsonify(visited_entry) if visited_entry else ('', 404)
 
 
-@views.route('/api/visited', methods=['POST'])
+@bp.route('/api/visited', methods=['POST'])
 @require_email_authorization
 def add_or_update_visited():
     """
@@ -164,7 +167,7 @@ def add_or_update_visited():
     VisitedData.save_visited_data(visited)
     return jsonify(new_visited), 200 if existing_country else 201
 
-@views.route('/api/visited/<uuid:visited_id>', methods=['PUT'])
+@bp.route('/api/visited/<uuid:visited_id>', methods=['PUT'])
 @require_email_authorization
 def update_visited(visited_id):
     """
@@ -187,7 +190,7 @@ def update_visited(visited_id):
     VisitedData.save_visited_data(visited)
     return jsonify(visited_entry)
 
-@views.route('/api/visited/<uuid:visited_id>', methods=['DELETE'])
+@bp.route('/api/visited/<uuid:visited_id>', methods=['DELETE'])
 @require_email_authorization
 def delete_visited(visited_id):
     """
@@ -206,7 +209,7 @@ def delete_visited(visited_id):
     VisitedData.save_visited_data(visited)
     return ('', 204)
 
-@views.route('/api/links', methods=['GET'])
+@bp.route('/api/links', methods=['GET'])
 @require_email_authorization
 def get_links():
     """
@@ -219,7 +222,7 @@ def get_links():
     """
     return jsonify(LinksData.load_links_data())
 
-@views.route('/api/links', methods=['POST'])
+@bp.route('/api/links', methods=['POST'])
 @require_email_authorization
 def add_link():
     """
@@ -239,7 +242,7 @@ def add_link():
     LinksData.save_links_data(links)
     return jsonify(new_link), 201
 
-@views.route('/api/links/<id>', methods=['PUT'])
+@bp.route('/api/links/<id>', methods=['PUT'])
 @require_email_authorization
 def update_link(id):
     """
@@ -263,7 +266,7 @@ def update_link(id):
     LinksData.save_links_data(links)
     return jsonify(link)
 
-@views.route('/api/links/<id>', methods=['DELETE'])
+@bp.route('/api/links/<id>', methods=['DELETE'])
 @require_email_authorization
 def delete_link(id):
     """
@@ -282,106 +285,3 @@ def delete_link(id):
     LinksData.save_links_data(links)
     return ('', 204)
 
-@views.route('/authorize/<provider>')
-def oauth2_authorize(provider):
-    """
-    Initiate OAuth2 authorization for a specified provider.
-
-    This endpoint initiates the OAuth2 authorization process for a given provider. It generates a state token for security, constructs a query string with OAuth2 parameters, and redirects the user to the provider's authorization URL.
-
-    Args:
-        provider (str): The name of the OAuth2 provider to authorize.
-
-    Returns:
-        werkzeug.wrappers.Response: A redirect response to the OAuth2 provider's authorization URL with the necessary query parameters.
-
-    Raises:
-        HTTPException: An HTTP 404 error if the provider is not configured.
-    """
-    provider_data = current_app.config['OAUTH2_PROVIDERS'].get(provider)
-    if provider_data is None:
-        abort(404)
-
-    # generate a random string for the state parameter
-    session['oauth2_state'] = secrets.token_urlsafe(16)
-
-    # create a query string with all the OAuth2 parameters
-    qs = urlencode({
-        'client_id': provider_data['client_id'],
-        'redirect_uri': url_for('views.oauth2_callback', provider=provider,
-                                _external=True),
-        'response_type': 'code',
-        'scope': ' '.join(provider_data['scopes']),
-        'state': session['oauth2_state'],
-    })
-
-    # redirect the user to the OAuth2 provider authorization URL
-    return redirect(provider_data['authorize_url'] + '?' + qs)
-
-@views.route('/callback/<provider>')
-def oauth2_callback(provider):
-    """
-    Handle the OAuth2 callback from the provider.
-
-    This endpoint processes the callback after a user has authenticated with an OAuth2 provider. It validates the state parameter, exchanges the authorization code for an access token, and retrieves the user's email address using the access token. If any step fails, it aborts the process with the appropriate error code.
-
-    Args:
-        provider (str): The name of the OAuth2 provider.
-
-    Returns:
-        werkzeug.wrappers.Response: A redirect response to the 'world_map' view if successful, or an error response if any step of the authentication process fails.
-
-    Raises:
-        HTTPException: An HTTP 404 error if the provider is not configured, a 401 error if there is an authentication error, or if the state parameter or authorization code is invalid.
-    """
-    provider_data = current_app.config['OAUTH2_PROVIDERS'].get(provider)
-    if provider_data is None:
-        abort(404)
-
-    # if there was an authentication error, flash the error messages and exit
-    if 'error' in request.args:
-        for k, v in request.args.items():
-            if k.startswith('error'):
-                flash(f'{k}: {v}')
-        return redirect(url_for('views.world_map'))
-
-    # make sure that the state parameter matches the one we created in the
-    # authorization request
-    if request.args['state'] != session.get('oauth2_state'):
-        abort(401)
-
-    # make sure that the authorization code is present
-    if 'code' not in request.args:
-        abort(401)
-
-    # exchange the authorization code for an access token
-    response = requests.post(provider_data['token_url'], data={
-        'client_id': provider_data['client_id'],
-        'client_secret': provider_data['client_secret'],
-        'code': request.args['code'],
-        'grant_type': 'authorization_code',
-        'redirect_uri': url_for('views.oauth2_callback', provider=provider,
-                                _external=True),
-    }, headers={'Accept': 'application/json'})
-    if response.status_code != 200:
-        abort(401)
-    oauth2_token = response.json().get('access_token')
-    if not oauth2_token:
-        abort(401)
-
-    # use the access token to get the user's email address
-    response = requests.get(provider_data['userinfo']['url'], headers={
-        'Authorization': 'Bearer ' + oauth2_token,
-        'Accept': 'application/json',
-    })
-    if response.status_code != 200:
-        abort(401)
-    email = provider_data['userinfo']['email'](response.json())
-
-    session['email'] = email
-    return redirect(url_for('views.world_map'))
-
-@views.route('/email')
-def email():
-    """Test route. Display e-mail user is logged in as"""
-    return(session.get('email'))

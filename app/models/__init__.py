@@ -119,6 +119,6 @@ def require_email_authorization(f):
         allowed_emails = current_app.config['ALLOWED_EMAIL']
         if not is_email_allowed(email, allowed_emails):
             # Redirect to the authorization route if the email is not allowed
-            return redirect(url_for('views.oauth2_authorize', provider='google'))
+            return redirect(url_for('auth.oauth2_authorize', provider='google'))
         return f(*args, **kwargs)
     return decorated_function

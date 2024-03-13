@@ -1,3 +1,5 @@
+const apiURL = '/travel/api/links'
+
 document.addEventListener('DOMContentLoaded', function() {
     const linksListElement = document.getElementById('links-list');
     const addLinkForm = document.getElementById('add-link-form');
@@ -19,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
             notes: notesInput.value
         };
     
-        fetch(`/api/links/${id}`, {
+        fetch(apiURL + "/" + id, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to delete a link
     function deleteLink(id) {
         if (confirm('Are you sure you want to delete this link?')) {
-            fetch(`/api/links/${id}`, {
+            fetch(apiURL + "/" + id, {
                 method: 'DELETE'
             })
             .then(() => {
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Fetch and display the links
     function fetchLinks() {
-        fetch('/api/links')
+        fetch(apiURL)
             .then(response => response.json())
             .then(data => {
                 displayLinks(data);
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
             notes: notesInput.value
         };
 
-        fetch('/api/links', {
+        fetch(apiURL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

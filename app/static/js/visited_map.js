@@ -8,7 +8,7 @@ var visitedData = [];
 var geoJsonLayer;
 
 // Define the URLs for the API endpoints
-const visitedDataUrl = '/api/visited?whichMap=' + whichMap;
+const visitedDataUrl = '/travel/api/visited?whichMap=' + whichMap;
 
 const mapDataURL = '/static/data/' + whichMap + '.json'
 
