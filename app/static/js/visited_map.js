@@ -140,15 +140,19 @@ document.getElementById('countryForm').addEventListener('submit', function(event
     event.preventDefault();
 
     // Get the form data
-    const countryId = document.getElementById('countryId').value;
     const countryName = document.getElementById('countryName').value;
     const visitedJohn = document.getElementById('visitedJohn').checked;
     const visitedMarcia = document.getElementById('visitedMarcia').checked;
     const todo = document.getElementById('todo').checked;
 
-    // Determine if this is an add or update operation based on the presence of an ID
-    const method = countryId ? 'PUT' : 'POST';
-    const endpoint = countryId ? `/api/visited/${countryId}` : '/api/visited';
+    // Find the country in the visitedData array
+    const countryData = visitedData.find(country => country.name === countryName);
+
+    // Determine if this is an add or update operation based on the presence of an ID in the visitedData
+    const method = countryData ? 'PUT' : 'POST';
+    const endpoint = countryData ? `/travel/api/visited/${countryData.id}` : '/travel/api/visited';
+
+    console.log(countryData)
 
     // Create the request body
     const requestBody = {
@@ -156,13 +160,15 @@ document.getElementById('countryForm').addEventListener('submit', function(event
         john: visitedJohn,
         marcia: visitedMarcia,
         todo: todo,
-        which_map: whichMap
+        which_map: whichMap,
     };
 
-    // If updating, include the ID in the request body
-    if (method === 'PUT') {
-        requestBody.id = parseInt(countryId);
+    // Add the country_id to the requestBody only if it exists
+    if (countryData && countryData.id) {
+        requestBody.id = countryData.id;
     }
+
+    console.log(requestBody)
 
     // Send the data to the server
     fetch(endpoint, {
@@ -179,7 +185,7 @@ document.getElementById('countryForm').addEventListener('submit', function(event
         // Update the UI as needed
     })
     .then(fetchAndUpdateVisitedData())
-    .then(populateCountryDropdown())
+    .then(updateVisitedList())
     .catch((error) => {
         console.error('Error:', error);
     });
