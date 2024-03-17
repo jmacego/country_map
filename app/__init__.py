@@ -8,6 +8,8 @@ from app.extensions import db
 from app.auth import bp as auth_bp
 from app.dates import bp as dates_bp
 from app.travel import bp as travel_bp
+from app.finances import bp as finances_bp
+
 
 
 def create_app(config_class=Config):
@@ -25,6 +27,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp)
     app.register_blueprint(dates_bp)
     app.register_blueprint(travel_bp)
+    app.register_blueprint(finances_bp)
 
     # Default page
     @app.route("/")

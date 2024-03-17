@@ -1,21 +1,10 @@
 from flask import Flask, jsonify, render_template, request, Blueprint, redirect, url_for, session, make_response, session, current_app, abort
-from requests_oauthlib import OAuth2Session
 import json
-import uuid
-import os
-import secrets
-import requests
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from dotenv import load_dotenv
-from urllib.parse import urlencode
 from ..models.travel import Visited, Links
 from ..models.auth import require_email_authorization
 
 from app.travel import bp
 
-# Load environment variables
-load_dotenv()
 
 @bp.route('/world')
 @require_email_authorization

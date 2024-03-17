@@ -3,9 +3,7 @@ import uuid
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
-
 from app.extensions import db
-
 
 # File path for the visited data file
 visited_file_path = 'instance/visited.json'
