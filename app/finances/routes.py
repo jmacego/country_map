@@ -1,21 +1,32 @@
 from flask import Flask, jsonify, render_template, request, Blueprint, redirect, url_for, session, make_response, session, current_app, abort
 from datetime import datetime
 
-from ..models.finances import Mortgage, BonusPayment
+from ..models.finances import Mortgage, BonusPayment, Savings
 from ..models.auth import require_email_authorization
 
 from app.finances import bp
 
 
-@bp.route('/mortgage')
+@bp.route('/mortgages')
 @require_email_authorization
 def mortgage():
-    return render_template('finances/mortgage.html', title='Mortgage Details')
+    return render_template('finances/mortgages.html', title='Mortgage Details')
+
+@bp.route('/savings')
+@require_email_authorization
+def savings():
+    return render_template('finances/savings.html', title='Savings Details')
 
 @bp.route('/api/mortgage', methods=['GET'])
 def get_mortgages():
     mortgages = Mortgage.get_all()
-    mortgages_list = [mortgage.to_dict() for mortgage in mortgages]  # Assuming a to_dict() method exists
+    mortgages_list = []
+    for mortgage in mortgages:
+        mortgage_dict = mortgage.to_dict()  # Assuming a to_dict() method exists
+        # Add the monthly payment details to the dictionary
+        monthly_payment = mortgage.calculate_monthly_payment()
+        mortgage_dict['monthly_payment'] = monthly_payment
+        mortgages_list.append(mortgage_dict)
     return jsonify(mortgages_list)
 
 @bp.route('/api/mortgage/<int:mortgage_id>', methods=['GET'])
@@ -85,6 +96,46 @@ def get_aggregated_rsu_payouts():
     )
     
     return jsonify(aggregated_payouts)
+
+@bp.route('/api/savings', methods=['POST'])
+@require_email_authorization
+def create_savings():
+    data = request.get_json()
+    new_savings = Savings.create(balance=data['balance'])
+    return jsonify(new_savings.to_dict()), 201
+
+@bp.route('/api/savings/latest', methods=['GET'])
+@require_email_authorization
+def get_latest_savings():
+    latest_savings = Savings.get_latest()
+    if latest_savings:
+        return jsonify(latest_savings.to_dict())
+    else:
+        return jsonify({'error': 'No savings account data found.'}), 404
+
+@bp.route('/api/savings', methods=['GET'])
+@require_email_authorization
+def get_savings():
+    all_savings = Savings.get_all()
+    return jsonify([savings.to_dict() for savings in all_savings])
+
+@bp.route('/api/savings/<int:savings_id>', methods=['PUT'])
+@require_email_authorization
+def update_savings(savings_id):
+    data = request.get_json()
+    savings = Savings.update(savings_id, balance=data['balance'])
+    if savings:
+        return jsonify(savings.to_dict())
+    else:
+        return jsonify({'error': 'Savings entry not found.'}), 404
+
+@bp.route('/api/savings/<int:savings_id>', methods=['DELETE'])
+@require_email_authorization
+def delete_savings(savings_id):
+    if Savings.delete(savings_id):
+        return jsonify({'message': 'Savings entry deleted.'}), 200
+    else:
+        return jsonify({'error': 'Savings entry not found.'}), 404
 
 
 @bp.route('/clearall')

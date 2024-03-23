@@ -195,26 +195,6 @@ function buildChart(ctx, chartData, currentPeriodIndex) {
     });
 }
 
-// Function to fetch and display mortgage details and charts
-function fetchMortgages() {
-    fetch('/finances/api/mortgage')
-        .then(response => response.json())
-        .then(mortgages => {
-            const list = document.getElementById('mortgagesList');
-            list.innerHTML = '';
-            const mortgageTable = createMortgageTable(mortgages);
-            list.appendChild(mortgageTable);
-            mortgages.forEach(mortgage => {
-                const amortizationSchedule = calculateAmortization(mortgage.principal, mortgage.interest_rate, mortgage.loan_term, mortgage.start_date);
-                const chartData = buildChartData(amortizationSchedule);
-                const currentPeriodIndex = amortizationSchedule.findIndex(item => item.isCurrent); // Define currentPeriodIndex here
-                // Render the chart
-                const ctx = document.getElementById(`chart-${mortgage.id}`).getContext('2d');
-                buildChart(ctx, chartData, currentPeriodIndex)
-            });
-        })
-        .catch(error => console.error('Error fetching mortgages:', error));
-}
 
 function updateEscrow(mortgageId) {
     var escrowAmount = parseFloat(document.getElementById('escrow-' + mortgageId).value);
@@ -244,7 +224,146 @@ function updateEscrow(mortgageId) {
     });
 }
 
+// Function to calculate monthly interest
+function calculateMonthlyInterest(principal, annualInterestRate) {
+    const monthlyInterestRate = annualInterestRate / 12 / 100;
+    return principal * monthlyInterestRate;
+}
+
+// Function to calculate monthly principal
+function calculateMonthlyPrincipal(monthlyPayment, monthlyInterest) {
+    return monthlyPayment - monthlyInterest;
+}
+
+// Function to fetch bonus payments
+function fetchBonusPayments() {
+    return fetch('/finances/api/aggregated_rsu_payouts').then(response => response.json());
+}
+
+// Fetch savings amount
+function fetchLatestSavings() {
+    return fetch('/finances/api/savings/latest').then(response => response.json());
+}
+
+// Do the comma thing
+function formatCurrency(number) {
+    return '$' + parseFloat(number).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+}
+
+// Function to calculate monthly interest
+function calculateMonthlyInterest(remainingPrincipal, annualInterestRate) {
+    const monthlyInterestRate = annualInterestRate / 12 / 100;
+    return remainingPrincipal * monthlyInterestRate;
+}
+
+// Function to calculate monthly principal
+function calculateMonthlyPrincipal(totalMonthlyPayment, monthlyInterest, monthlyEscrow) {
+    return totalMonthlyPayment - monthlyInterest - monthlyEscrow;
+}
+
+// Function to build the finance table HTML
+function buildTableHTML(mortgages, payouts, latestSavings) {
+    let tableHTML = `
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Month</th>
+                        <th>Account Balance</th>
+                        <th>Total Mortgage Payment</th>
+                        <th>Escrow</th>
+                        <th>Principal</th>
+                        <th>Interest</th>
+                        <th>Bonus/RSU Payout</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+
+    mortgages.forEach(mortgage => {
+        let remainingPrincipal = mortgage.principal;
+
+        for (let monthOffset = 0; monthOffset < 24; monthOffset++) {
+            const date = new Date(currentYear, currentDate.getMonth() + monthOffset, 1);
+            const monthlyInterest = calculateMonthlyInterest(remainingPrincipal, mortgage.interest_rate);
+            const monthlyPrincipal = calculateMonthlyPrincipal(mortgage.monthly_payment, monthlyInterest, mortgage.monthly_escrow);
+            remainingPrincipal -= monthlyPrincipal;
+            latestSavings += (payouts[monthOffset] ? payouts[monthOffset].amount : 0) - (monthlyPrincipal + monthlyInterest);
+
+            tableHTML += `
+                <tr>
+                    <td>${date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</td>
+                    <td>${formatCurrency(latestSavings)}</td>
+                    <td>${formatCurrency(mortgage.monthly_payment)}</td>
+                    <td>${formatCurrency(mortgage.monthly_escrow)}</td>
+                    <td>${formatCurrency(monthlyPrincipal)}</td>
+                    <td>${formatCurrency(monthlyInterest)}</td>
+                    <td>${formatCurrency((payouts[monthOffset] ? payouts[monthOffset].amount : 0))}</td>
+                </tr>
+            `;
+        }
+    });
+
+    tableHTML += `</tbody></table></div>`;
+    return tableHTML;
+}
+
+
+// Function to fetch mortgage details
+function fetchMortgages() {
+    return fetch('/finances/api/mortgage').then(response => response.json());
+}
+
+// Function to handle the response for mortgages
+function handleMortgagesResponse(mortgages) {
+    const list = document.getElementById('mortgagesList');
+    list.innerHTML = '';
+    const mortgageTable = createMortgageTable(mortgages);
+    list.appendChild(mortgageTable);
+    mortgages.forEach(mortgage => {
+        renderMortgageChart(mortgage);
+    });
+}
+
+// Function to render the chart for a mortgage
+function renderMortgageChart(mortgage) {
+    const amortizationSchedule = calculateAmortization(mortgage.principal, mortgage.interest_rate, mortgage.loan_term, mortgage.start_date);
+    const chartData = buildChartData(amortizationSchedule);
+    const currentPeriodIndex = amortizationSchedule.findIndex(item => item.isCurrent);
+    const ctx = document.getElementById(`chart-${mortgage.id}`).getContext('2d');
+    buildChart(ctx, chartData, currentPeriodIndex);
+}
+
+// Function to handle the response for latest savings
+function handleLatestSavingsResponse(latestSavings, mortgages, payouts) {
+    const financeDiv = document.getElementById('financeOverview');
+    if (latestSavings && !latestSavings.error) {
+        // Ensure you are using the mortgages and payouts data correctly here
+        financeDiv.innerHTML = buildTableHTML(mortgages, payouts, latestSavings.balance);
+    } else {
+        console.error('Error fetching latest savings data:', latestSavings.error);
+    }
+}
+
+// Main function to build the finance table
+function buildFinanceTable() {
+    Promise.all([fetchMortgages(), fetchBonusPayments(), fetchLatestSavings()])
+        .then(([mortgages, payouts, latestSavings]) => {
+            // Now pass the mortgages and payouts to the function that needs them
+            handleLatestSavingsResponse(latestSavings, mortgages, payouts);
+            handleMortgagesResponse(mortgages);
+            // You can also handle payouts here if needed
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            // Handle the error appropriately in the UI
+        });
+}
+
 // Code that interacts with the DOM goes here
 document.addEventListener('DOMContentLoaded', function() {
-    fetchMortgages();
+    buildFinanceTable();
 });

@@ -60,6 +60,19 @@ class Mortgage(db.Model):
             db.session.commit()
             return True
         return False
+
+    def calculate_monthly_payment(self):
+        monthly_interest_rate = self.interest_rate / 12 / 100  # Convert annual rate to monthly and percentage to decimal
+        total_payments = self.loan_term * 12  # Total number of monthly payments
+
+        # Calculate monthly payment for principal and interest
+        principal_and_interest_payment = (monthly_interest_rate * self.principal) / (1 - pow(1 + monthly_interest_rate, -total_payments))
+
+        # Add monthly escrow to the principal and interest payment
+        total_monthly_payment = principal_and_interest_payment + self.monthly_escrow
+
+        return total_monthly_payment
+
     
     @classmethod
     def clear_and_load(cls, json_file_path):
@@ -141,3 +154,48 @@ class BonusPayment(db.Model):
     @staticmethod
     def find_all_rsu_payments():
         return BonusPayment.query.filter_by(bonus_type='rsu').all()
+
+class Savings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    balance = db.Column(db.Float, nullable=False)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'balance': self.balance,
+            'last_updated': self.last_updated.isoformat()
+        }
+
+    @classmethod
+    def create(cls, balance):
+        new_savings = cls(balance=balance)
+        db.session.add(new_savings)
+        db.session.commit()
+        return new_savings
+
+    @classmethod
+    def get_latest(cls):
+        return cls.query.order_by(cls.last_updated.desc()).first()
+
+    @classmethod
+    def get_all(cls):
+        return cls.query.all()
+
+    @classmethod
+    def update(cls, savings_id, balance):
+        savings = cls.query.get(savings_id)
+        if savings:
+            savings.balance = balance
+            db.session.commit()
+            return savings
+        return None
+
+    @classmethod
+    def delete(cls, savings_id):
+        savings = cls.query.get(savings_id)
+        if savings:
+            db.session.delete(savings)
+            db.session.commit()
+            return True
+        return False
