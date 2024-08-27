@@ -1,10 +1,13 @@
 import os
+import warnings
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
+    if not SECRET_KEY:
+        warnings.warn("SECRET_KEY is not set! Using a default value. This is insecure in production!")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     if os.environ.get('ALLOWED_EMAIL'):
         ALLOWED_EMAIL = os.environ.get('ALLOWED_EMAIL').split(",")

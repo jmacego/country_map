@@ -7,6 +7,10 @@ WORKDIR /usr/src/app
 # Copy the current directory contents into the container at /usr/src/app
 COPY requirements.txt ./
 
+# Update packages for gdal
+RUN apt-get update
+RUN apt-get install -y gdal-bin libgdal-dev g++
+
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
