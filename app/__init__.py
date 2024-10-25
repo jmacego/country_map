@@ -3,7 +3,7 @@ import os
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import Config
-from app.extensions import db
+from app.extensions import db, migrate
 
 from app.auth import bp as auth_bp
 from app.dates import bp as dates_bp
@@ -19,6 +19,7 @@ def create_app(config_class=Config):
 
     # Initialize Flask extensions here
     db.init_app(app)
+    migrate.init_app(app, db)
 
     # Fix nginx set proxy header
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
