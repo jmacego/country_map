@@ -11,8 +11,12 @@ COPY requirements.txt ./
 RUN apt-get update
 RUN apt-get install -y gdal-bin libgdal-dev g++
 
+
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Install pip-tools for dependency management
+RUN pip install pip-tools
 
 # Install Gunicorn
 RUN pip install gunicorn
